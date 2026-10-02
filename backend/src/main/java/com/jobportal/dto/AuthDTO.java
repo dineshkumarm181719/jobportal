@@ -44,7 +44,12 @@ public class AuthDTO {
         private String phone;
 
         @NotNull(message = "Role is required")
-        private Role role; // CANDIDATE or RECRUITER
+        private Role role; // CANDIDATE, RECRUITER, or COMPANY_ADMIN
+
+        private String companyName;
+        private String companyWebsite;
+        private String companyLocation;
+        private String companyIndustry;
     }
 
     @Getter

@@ -244,6 +244,85 @@ export const Navbar = ({ toggleSidebar, showSidebarToggle = false }) => {
                             <span>My Profile & Resume</span>
                           </Link>
                         )}
+
+                        {user.role === 'COMPANY_ADMIN' && (
+                          <>
+                            <Link
+                              to="/company/recruiters"
+                              onClick={() => setIsUserMenuOpen(false)}
+                              className="flex items-center space-x-2 px-4 py-2 text-xs font-semibold text-slate-700 hover:bg-indigo-50 hover:text-indigo-600 transition-colors"
+                            >
+                              <Users className="w-4 h-4 text-slate-400" />
+                              <span>Manage Recruiters</span>
+                            </Link>
+                            <Link
+                              to="/company/jobs"
+                              onClick={() => setIsUserMenuOpen(false)}
+                              className="flex items-center space-x-2 px-4 py-2 text-xs font-semibold text-slate-700 hover:bg-indigo-50 hover:text-indigo-600 transition-colors"
+                            >
+                              <Briefcase className="w-4 h-4 text-slate-400" />
+                              <span>Company Jobs</span>
+                            </Link>
+                            <Link
+                              to="/company/profile"
+                              onClick={() => setIsUserMenuOpen(false)}
+                              className="flex items-center space-x-2 px-4 py-2 text-xs font-semibold text-slate-700 hover:bg-indigo-50 hover:text-indigo-600 transition-colors"
+                            >
+                              <Building className="w-4 h-4 text-slate-400" />
+                              <span>Company Profile</span>
+                            </Link>
+                          </>
+                        )}
+
+                        {user.role === 'SYSTEM_ADMIN' && (
+                          <>
+                            <Link
+                              to="/admin/users"
+                              onClick={() => setIsUserMenuOpen(false)}
+                              className="flex items-center space-x-2 px-4 py-2 text-xs font-semibold text-slate-700 hover:bg-indigo-50 hover:text-indigo-600 transition-colors"
+                            >
+                              <Users className="w-4 h-4 text-slate-400" />
+                              <span>Platform Users</span>
+                            </Link>
+                            <Link
+                              to="/admin/companies"
+                              onClick={() => setIsUserMenuOpen(false)}
+                              className="flex items-center space-x-2 px-4 py-2 text-xs font-semibold text-slate-700 hover:bg-indigo-50 hover:text-indigo-600 transition-colors"
+                            >
+                              <Building className="w-4 h-4 text-slate-400" />
+                              <span>Manage Companies</span>
+                            </Link>
+                            <Link
+                              to="/admin/jobs"
+                              onClick={() => setIsUserMenuOpen(false)}
+                              className="flex items-center space-x-2 px-4 py-2 text-xs font-semibold text-slate-700 hover:bg-indigo-50 hover:text-indigo-600 transition-colors"
+                            >
+                              <Briefcase className="w-4 h-4 text-slate-400" />
+                              <span>All System Jobs</span>
+                            </Link>
+                          </>
+                        )}
+
+                        {user.role === 'RECRUITER' && (
+                          <>
+                            <Link
+                              to="/recruiter/jobs"
+                              onClick={() => setIsUserMenuOpen(false)}
+                              className="flex items-center space-x-2 px-4 py-2 text-xs font-semibold text-slate-700 hover:bg-indigo-50 hover:text-indigo-600 transition-colors"
+                            >
+                              <Briefcase className="w-4 h-4 text-slate-400" />
+                              <span>Manage Jobs</span>
+                            </Link>
+                            <Link
+                              to="/recruiter/profile"
+                              onClick={() => setIsUserMenuOpen(false)}
+                              className="flex items-center space-x-2 px-4 py-2 text-xs font-semibold text-slate-700 hover:bg-indigo-50 hover:text-indigo-600 transition-colors"
+                            >
+                              <User className="w-4 h-4 text-slate-400" />
+                              <span>Recruiter Profile</span>
+                            </Link>
+                          </>
+                        )}
                       </div>
 
                       <div className="pt-1 border-t border-slate-100">

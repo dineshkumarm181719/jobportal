@@ -30,6 +30,7 @@ public class AuthService {
     private final UserRepository userRepository;
     private final CandidateRepository candidateRepository;
     private final RecruiterRepository recruiterRepository;
+    private final com.jobportal.repository.CompanyRepository companyRepository;
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
     private final JwtService jwtService;
@@ -41,9 +42,9 @@ public class AuthService {
             throw new BadRequestException("Email address is already registered: " + request.getEmail());
         }
 
-        // Restrict public registration to CANDIDATE or RECRUITER
+        // Support CANDIDATE, RECRUITER, or COMPANY_ADMIN
         Role role = request.getRole();
-        if (role == null || (role != Role.CANDIDATE && role != Role.RECRUITER)) {
+        if (role == null || (role != Role.CANDIDATE && role != Role.RECRUITER && role != Role.COMPANY_ADMIN)) {
             role = Role.CANDIDATE;
         }
 
@@ -73,6 +74,29 @@ public class AuthService {
             Recruiter recruiter = Recruiter.builder()
                     .user(user)
                     .designation("Talent Acquisition Specialist")
+                    .build();
+            recruiter = recruiterRepository.save(recruiter);
+            recruiterId = recruiter.getId();
+        } else if (role == Role.COMPANY_ADMIN) {
+            String compName = request.getCompanyName();
+            if (compName == null || compName.trim().isEmpty()) {
+                compName = user.getName() + "'s Organization";
+            }
+            com.jobportal.entity.Company company = com.jobportal.entity.Company.builder()
+                    .name(compName.trim())
+                    .industry(request.getCompanyIndustry() != null ? request.getCompanyIndustry() : "Technology")
+                    .location(request.getCompanyLocation() != null ? request.getCompanyLocation() : "Remote")
+                    .website(request.getCompanyWebsite())
+                    .description("Corporate organization managed by " + user.getName())
+                    .build();
+            company = companyRepository.save(company);
+            companyId = company.getId();
+            companyName = company.getName();
+
+            Recruiter recruiter = Recruiter.builder()
+                    .user(user)
+                    .company(company)
+                    .designation("Company Administrator")
                     .build();
             recruiter = recruiterRepository.save(recruiter);
             recruiterId = recruiter.getId();
@@ -128,7 +152,7 @@ public class AuthService {
             if (candidate != null) {
                 candidateId = candidate.getId();
             }
-        } else if (user.getRole() == Role.RECRUITER) {
+        } else if (user.getRole() == Role.RECRUITER || user.getRole() == Role.COMPANY_ADMIN) {
             Recruiter recruiter = recruiterRepository.findByUserId(user.getId()).orElse(null);
             if (recruiter != null) {
                 recruiterId = recruiter.getId();

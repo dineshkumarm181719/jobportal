@@ -17,4 +17,9 @@ export const adminService = {
     const response = await api.put(`/admin/users/${id}/status`, { status });
     return response.data;
   },
+
+  createUser: async (userData) => {
+    const response = await api.post('/admin/users', userData);
+    return response.data;
+  },
 };

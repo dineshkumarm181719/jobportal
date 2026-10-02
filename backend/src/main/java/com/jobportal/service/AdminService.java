@@ -18,6 +18,11 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.jobportal.entity.Company;
+import com.jobportal.entity.Recruiter;
+import com.jobportal.exception.BadRequestException;
+import org.springframework.security.crypto.password.PasswordEncoder;
+
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -31,6 +36,7 @@ public class AdminService {
     private final CompanyRepository companyRepository;
     private final JobRepository jobRepository;
     private final ApplicationRepository applicationRepository;
+    private final PasswordEncoder passwordEncoder;
 
     @Transactional(readOnly = true)
     public UserDTO.AdminDashboardStats getAdminStats() {
@@ -104,6 +110,56 @@ public class AdminService {
 
         user.setStatus(request.getStatus());
         user = userRepository.save(user);
+
+        return mapToUserResponse(user);
+    }
+
+    @Transactional
+    public UserDTO.UserResponse createUser(UserDTO.CreateUserRequest request) {
+        if (userRepository.existsByEmail(request.getEmail())) {
+            throw new BadRequestException("Email is already registered: " + request.getEmail());
+        }
+
+        User user = User.builder()
+                .name(request.getName())
+                .email(request.getEmail().toLowerCase().trim())
+                .password(passwordEncoder.encode(request.getPassword()))
+                .phone(request.getPhone())
+                .role(request.getRole())
+                .status(UserStatus.ACTIVE)
+                .build();
+
+        user = userRepository.save(user);
+
+        if (request.getRole() == Role.CANDIDATE) {
+            Candidate candidate = Candidate.builder()
+                    .user(user)
+                    .build();
+            candidateRepository.save(candidate);
+        } else if (request.getRole() == Role.RECRUITER || request.getRole() == Role.COMPANY_ADMIN) {
+            Company company = null;
+            if (request.getCompanyId() != null) {
+                company = companyRepository.findById(request.getCompanyId()).orElse(null);
+            }
+            if (company == null) {
+                List<Company> companies = companyRepository.findAll();
+                if (!companies.isEmpty()) {
+                    company = companies.get(0);
+                }
+            }
+
+            String designation = request.getDesignation();
+            if (designation == null || designation.trim().isEmpty()) {
+                designation = request.getRole() == Role.COMPANY_ADMIN ? "Company Administrator" : "Corporate Recruiter";
+            }
+
+            Recruiter recruiter = Recruiter.builder()
+                    .user(user)
+                    .company(company)
+                    .designation(designation)
+                    .build();
+            recruiterRepository.save(recruiter);
+        }
 
         return mapToUserResponse(user);
     }

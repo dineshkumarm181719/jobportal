@@ -54,11 +54,13 @@ public class SecurityConfig {
         http
                 .cors(cors -> cors.configurationSource(corsConfig.corsConfigurationSource()))
                 .csrf(AbstractHttpConfigurer::disable)
+                .headers(headers -> headers.frameOptions(frame -> frame.sameOrigin()))
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authenticationProvider(authenticationProvider())
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
                 .authorizeHttpRequests(auth -> auth
                         // Public endpoints
+                        .requestMatchers("/", "/favicon.ico", "/h2-console/**").permitAll()
                         .requestMatchers("/api/auth/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/jobs", "/api/jobs/{id}").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/companies", "/api/companies/{id}").permitAll()

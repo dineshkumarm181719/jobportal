@@ -7,6 +7,7 @@ import com.jobportal.enums.Role;
 import com.jobportal.service.AdminService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -33,6 +34,15 @@ public class AdminController {
     ) {
         PagedResponse<UserDTO.UserResponse> response = adminService.getAllUsers(role, page, size);
         return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/users")
+    public ResponseEntity<ApiResponse<UserDTO.UserResponse>> createUser(
+            @Valid @RequestBody UserDTO.CreateUserRequest request
+    ) {
+        UserDTO.UserResponse response = adminService.createUser(request);
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(ApiResponse.success("User provisioned successfully", response));
     }
 
     @PutMapping("/users/{id}/status")
